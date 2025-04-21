@@ -1,157 +1,250 @@
 #include <iostream>
-#include <algorithm>
 #include <queue>
 #include <vector>
 using namespace std;
 
+void printResult(int tat[] , int wt[] , int n){
 
+    float totalTAT = 0 , totalWT = 0 ,avgTAT = 0 , avgWT = 0 ;
 
-void fcfs( int at[] , int bt[] , int n ){
+    for(int i=0 ; i<n ; i++){
+        totalTAT = totalTAT + tat[i];
+        totalWT = totalWT + wt[i];
+    }
 
-    //Declaring Type Process for Priority Queue
-    using pro = pair<int,int>;
+    avgTAT = totalTAT / n ;
+    avgWT = totalWT / n ;
 
-    // Priority Queue Initialization
-    priority_queue<pro,vector<pro>,greater<pro>> pq;
+    cout << "TAT : " << totalTAT << " WT : " << totalWT << endl;
+    cout << "Avg TAT : " << avgTAT << " Avg WT : " << avgWT  << endl; 
+}
 
-    //Utility Vars
+void fcfs(int at[],int bt[], int n){
+    
+    //Initialilze Type of Process
+    using process = pair<int , int>;
+
+    //Initializing Priority Queue
+    priority_queue<process,vector<process>,greater<process>> pq ;
+
+    //Utils
     int ct = 0;
-    int tat[n] = {};
-    int wt [n] = {};
+    int completed = 0 ;
     bool done[n] = {false};
-    int completed = 0; 
-
+    int tat[n] = {};
+    int wt[n] = {};
 
     while(completed < n){
 
-        for(int i = 0 ; i < n ; i++){
-
-            if( at[i] <= ct && done[i]!= true ){
+        for(int i=0;i<n;i++){
+            if(at[i]<=ct && !done[i]){
                 pq.push({at[i],i});
                 done[i] = true;
             }
         }
 
-
         if(!pq.empty()){
 
-            pro el = pq.top();
+            process el = pq.top();
             pq.pop();
-
             int idx = el.second;
 
-            cout << idx;
             ct = ct + bt[idx];
-            tat[idx] = ct - el.first;
+            tat[idx] = ct - at[idx];
             wt[idx] = tat[idx] - bt[idx];
             completed++;
 
         }else{
             ct ++ ;
         }
-
-
     }
 
-    float avgTAT = 0;
-    float avgWT = 0;
-    float TAT = 0;
-    float WT = 0;
+    printResult(tat,wt,n);
 
-    for(int i = 0 ; i < n ; i++){
-        TAT = TAT + tat[i];
-        WT = WT + wt[i];
-    }
-
-    cout << "Total TAT : "<< TAT << " TOTAL WT : " << WT << endl;
-    avgTAT = TAT / n;
-    avgWT = WT / n;
-
-    cout << "AVG TAT : "<< avgTAT << " avg WT : " << avgWT << endl;
 }
 
+void sjfN(int at[],int bt[], int n){
+    
+    //Initialilze Type of Process
+    using process = pair<int , int>;
 
-void sjfN( int at[] , int bt[] , int n ){
+    //Initializing Priority Queue
+    priority_queue<process,vector<process>,greater<process>> pq ;
 
-    //Declaring Type of Process to be used in Priority Queue
-    using process = pair<int,int>;
-
-    //Priority Queue Declartion 
-    priority_queue<process,vector<process>,greater<process>> pq;
-
-    //Utitlity Values
+    //Utils
     int ct = 0;
     int completed = 0 ;
-    int done[n] = {false};
+    bool done[n] = {false};
     int tat[n] = {};
     int wt[n] = {};
 
     while(completed < n){
 
-        for(int i = 0 ; i < n ; i++ ){
-            if(at[i] <= ct && done[i]!= true){
+        for(int i=0;i<n;i++){
+            if(at[i]<=ct && !done[i]){
                 pq.push({bt[i],i});
                 done[i] = true;
             }
         }
 
         if(!pq.empty()){
+
             process el = pq.top();
             pq.pop();
-            
             int idx = el.second;
-            ct = ct + el.first;
+
+            ct = ct + bt[idx];
             tat[idx] = ct - at[idx];
-            wt[idx] = tat[idx] - el.first;
+            wt[idx] = tat[idx] - bt[idx];
             completed++;
-        }
-        else{
+
+        }else{
             ct ++ ;
         }
-
     }
 
-
-    // Printing Data
-    float avgTAT = 0;
-    float avgWT = 0;
-    float TAT = 0;
-    float WT = 0;
-
-    for(int i = 0 ; i < n ; i++){
-        TAT = TAT + tat[i];
-        WT = WT + wt[i];
-    }
-
-    cout << "Total TAT : "<< TAT << " TOTAL WT : " << WT << endl;
-    avgTAT = TAT / n;
-    avgWT = WT / n;
-
-    cout << "AVG TAT : "<< avgTAT << " avg WT : " << avgWT << endl;
+    printResult(tat,wt,n);
 
 }
 
+void sjfP(int at[],int bt[], int n){
+    
+    //Initialilze Type of Process
+    using process = pair<int , int>;
 
-void sjfP( int at[] , int bt[] , int n){
+    //Initializing Priority Queue
+    priority_queue<process,vector<process>,greater<process>> pq ;
 
-    //Type Declartion for Priority Queue
-    using process = pair<int,int>;
+    //Utils
+    int ct = 0;
+    int completed = 0 ;
+    bool done[n] = {false};
+    int tat[n] = {};
+    int wt[n] = {};
+    int btToBeModified [n] = {};
 
-    //Priority Queue Declartion
-    priority_queue<process,vector<process>,greater<process>> pq;
+    for(int i = 0 ; i < n ; i ++){
+        btToBeModified[i] = bt[i];
+    }
 
-    //Utility Functions
-    int ct = 0 ;
-    int completed = 0;
+    while(completed < n){
+
+        for(int i=0;i<n;i++){
+            if(at[i]<=ct && !done[i]){
+                pq.push({bt[i],i});
+                done[i] = true;
+            }
+        }
+
+        if(!pq.empty()){
+
+            process el = pq.top();
+            pq.pop();
+            int idx = el.second;
+
+            btToBeModified[idx] = btToBeModified[idx] - 1 ;
+            ct ++ ;
+
+            if(btToBeModified[idx] == 0 ){
+
+                tat[idx] = ct - at[idx];
+                wt[idx] = tat[idx] - bt[idx];
+                completed ++ ;
+
+            }else{
+                pq.push(el);
+            }
+
+        }else{
+            ct++;
+        }
+
+        
+    }
+
+    printResult(tat,wt,n);
+
+}
+
+void prioP(int at[],int bt[], int p[] ,int n){
+    
+    //Initialilze Type of Process
+    using process = pair<int , int>;
+
+    //Initializing Priority Queue
+    priority_queue<process,vector<process>> pq ;
+
+    //Utils
+    int ct = 0;
+    int completed = 0 ;
+    bool done[n] = {false};
+    int tat[n] = {};
+    int wt[n] = {};
+    int btToBeModified [n] = {};
+
+    for(int i = 0 ; i < n ; i ++){
+        btToBeModified[i] = bt[i];
+    }
+
+    while(completed < n){
+
+        for(int i=0;i<n;i++){
+            if(at[i]<=ct && !done[i]){
+                pq.push({p[i],i});
+                done[i] = true;
+            }
+        }
+
+        if(!pq.empty()){
+
+            process el = pq.top();
+            pq.pop();
+            int idx = el.second;
+
+            btToBeModified[idx] = btToBeModified[idx] - 1 ;
+            ct ++ ;
+
+            if(btToBeModified[idx] == 0 ){
+
+                tat[idx] = ct - at[idx];
+                wt[idx] = tat[idx] - bt[idx];
+                completed ++ ;
+
+            }else{
+                pq.push(el);
+            }
+
+        }else{
+            ct++;
+        }
+
+        
+    }
+
+    printResult(tat,wt,n);
+
+}
+
+void prioN(int at[],int bt[], int p[], int n){
+    
+    //Initialilze Type of Process
+    using process = pair<int , int>;
+
+    //Initializing Priority Queue
+    priority_queue<process,vector<process>,greater<process>> pq ;
+
+    //Utils
+    int ct = 0;
+    int completed = 0 ;
     bool done[n] = {false};
     int tat[n] = {};
     int wt[n] = {};
 
-    while(completed<n){
+    while(completed < n){
 
-        for(int i = 0 ; i < n ; i++){
-            if( at[i] <= ct && done[i]!= true ){
-                pq.push({bt[i],i});
+        for(int i=0;i<n;i++){
+            if(at[i]<=ct && !done[i]){
+                pq.push({p[i],i});
                 done[i] = true;
             }
         }
@@ -160,315 +253,123 @@ void sjfP( int at[] , int bt[] , int n){
 
             process el = pq.top();
             pq.pop();
+            int idx = el.second;
 
-            if ( el.first == 0 ){
-                
-                int idx = el.second;
-                tat[idx] = ct - at[idx];
-                wt[idx] = tat[idx] - bt[idx];
-                completed++;
-
-            }else{
-                // If Burst Time is not zero Reduce it by 1
-                el.first = el.first - 1;
-                pq.push(el);
-                ct ++ ;
-            }
+            ct = ct + bt[idx];
+            tat[idx] = ct - at[idx];
+            wt[idx] = tat[idx] - bt[idx];
+            completed++;
 
         }else{
-            ct ++;
+            ct ++ ;
         }
-
     }
 
+    printResult(tat,wt,n);
 
-     // Printing Data
-     float avgTAT = 0;
-     float avgWT = 0;
-     float TAT = 0;
-     float WT = 0;
- 
-     for(int i = 0 ; i < n ; i++){
-         TAT = TAT + tat[i];
-         WT = WT + wt[i];
-     }
- 
-     cout << "Total TAT : "<< TAT << " TOTAL WT : " << WT << endl;
-     avgTAT = TAT / n;
-     avgWT = WT / n;
- 
-     cout << "AVG TAT : "<< avgTAT << " avg WT : " << avgWT << endl;
 }
 
+void roundRobin(int at[],int bt[] , int n , int timeQuantum){
 
-void roundRobin( int at[] , int bt[] , int n , int timeQuantum){
+    //Intializing Type of Process
+    using process = pair <int ,int >;
     
-    //Initialize Type for Priority Queue 
-    using process = pair<int , int>;
+    //Initialize Queue
+    queue<process> q;
 
-    //Initialize Priority Queue
-    queue<process> pq;
-
-    //Utils
+    //Utility
     int ct = 0 ;
     int completed = 0 ;
     bool done[n] = {false};
     int tat[n] = {};
-    int wt[n]  = {};
+    int wt[n] = {};
     int btToBeModified[n] = {};
-    
-    for(int i = 0 ; i < n ; i ++){
+
+    for(int i = 0 ; i<n ; i++){
         btToBeModified[i] = bt[i];
-    } 
+    }
 
-    while (completed < n)
-    {
-        for(int i=0 ; i<n ; i++){
+    while(completed < n){
 
-            if(at[i] <= ct && done[i] != true){
-                pq.push({at[i],i});
+        for(int i =0 ; i < n ; i++){
+            if(at[i] <= ct && !done[i]){
+                q.push({at[i],i});
                 done[i] = true ;
             }
         }
 
-        if(!pq.empty()){
+        if(!q.empty()){
 
-            process p = pq.front();
-            pq.pop();
-            
-            int idx = p.second;
+            process el = q.front();
+            q.pop();
+            int idx = el.second;
 
-            if(btToBeModified[idx] <= timeQuantum ){
+            if(btToBeModified[idx] <= timeQuantum){
 
                 ct = ct + btToBeModified[idx];
                 btToBeModified[idx] = 0 ;
                 tat[idx] = ct - at[idx];
                 wt[idx] = tat[idx] - bt[idx];
-                completed ++;
-
-                for(int i=idx+1 ; i<n ; i++){
-
-                    if(at[i] <= ct && done[i] != true){
-                        pq.push({at[i],i});
-                        done[i] = true ;
-                    }
-                }
-
-            }
-            else{
-
+                completed ++ ;
+                
+            }else{
                 btToBeModified[idx] = btToBeModified[idx] - timeQuantum;
                 ct = ct + timeQuantum;
-
-                for(int i=idx+1 ; i<n ; i++){
-
-                    if(at[i] <= ct && done[i] != true){
-                        pq.push({at[i],i});
+                
+                for(int i = idx + 1 ; i < n ; i++){
+                    if(at[i] <= ct && !done[i]){
+                        q.push({at[i],i});
                         done[i] = true ;
                     }
                 }
-                pq.push(p);
+
+                q.push(el);
             }
 
-
-        }
-        else{
-            ct ++;
-        }
-        
-    }
-
-     // Printing Data
-     float avgTAT = 0;
-     float avgWT = 0;
-     float TAT = 0;
-     float WT = 0;  cout << ct << endl;
- 
-     for(int i = 0 ; i < n ; i++){
-         cout << tat[i] << " ";
-         cout << wt[i] << endl;
-     }
- 
-     cout << "Total TAT : "<< TAT << " TOTAL WT : " << WT << endl;
-     avgTAT = TAT / n;
-     avgWT = WT / n;
- 
-     cout << "AVG TAT : "<< avgTAT << " avg WT : " << avgWT << endl;
-    
-}
-
-
-void priorityN( int at[] , int bt[] , int p [], int n ){
-
-    //Declaring Type of Process to be used in Priority Queue
-    using process = pair<int,int>;
-
-    //Priority Queue Declartion 
-    priority_queue<process,vector<process>,greater<process>> pq;
-
-    //Utitlity Values
-    int ct = 0;
-    int completed = 0 ;
-    int done[n] = {false};
-    int tat[n] = {};
-    int wt[n] = {};
-
-    while(completed < n){
-
-        for(int i = 0 ; i < n ; i++ ){
-            if(at[i] <= ct && done[i]!= true){
-                pq.push({p[i],i});
-                done[i] = true;
-            }
-        }
-
-        if(!pq.empty()){
-            process el = pq.top();
-            pq.pop();
-            
-            int idx = el.second;
-            ct = ct + bt[idx];
-            tat[idx] = ct - at[idx];
-            wt[idx] = tat[idx] - bt[idx];
-            completed++;
-        }
-        else{
-            ct ++ ;
-        }
-
-    }
-
-
-    // Printing Data
-    float avgTAT = 0;
-    float avgWT = 0;
-    float TAT = 0;
-    float WT = 0;
-
-    for(int i = 0 ; i < n ; i++){
-        TAT = TAT + tat[i];
-        WT = WT + wt[i];
-    }
-
-    cout << "Total TAT : "<< TAT << " TOTAL WT : " << WT << endl;
-    avgTAT = TAT / n;
-    avgWT = WT / n;
-
-    cout << "AVG TAT : "<< avgTAT << " avg WT : " << avgWT << endl;
-
-}
-
-
-void priorityP( int at[] , int bt[] , int p [] ,int n){
-
-    //Type Declartion for Priority Queue
-    using process = pair<int,int>;
-
-    //Priority Queue Declartion
-    priority_queue<process,vector<process>> pq;
-
-    //Utility Functions
-    int ct = 0 ;
-    int completed = 0;
-    bool done[n] = {false};
-    int tat[n] = {};
-    int wt[n] = {};
-    int btToBeModified[n] = {};
-    
-    for(int i = 0 ; i < n ; i ++){
-        btToBeModified[i] = bt[i];
-    } 
-
-    while(completed<n){
-
-        for(int i = 0 ; i < n ; i++){
-            if( at[i] <= ct && done[i]!= true){
-                pq.push({p[i],i});
-                done[i] = true;
-            }
-        }
-
-        if(!pq.empty()){
-
-            process el = pq.top();
-            pq.pop();
-            int idx = el.second;
-
-            btToBeModified[idx] = btToBeModified[idx] - 1;
-            ct ++;
-
-            if ( btToBeModified[idx] == 0 ){
-                cout << ct << "at idx " << idx << endl ;
-                tat[idx] = ct - at[idx];
-                wt[idx] = tat[idx] - bt[idx];
-                completed++;
-
-            }else{
-                pq.push(el);
-            }
 
         }else{
-            ct ++;
+            ct++;
         }
 
     }
 
-
-    for(int i = 0 ; i < n ; i++){
-        cout << tat[i] << " ";
-    }
-     
-     // Printing Data
-     float avgTAT = 0;
-     float avgWT = 0;
-     float TAT = 0;
-     float WT = 0;
- 
-     for(int i = 0 ; i < n ; i++){
-         TAT = TAT + tat[i];
-         WT = WT + wt[i];
-     }
- 
-     cout << "Total TAT : "<< TAT << " TOTAL WT : " << WT << endl;
-     avgTAT = TAT / n;
-     avgWT = WT / n;
- 
-     cout << "AVG TAT : "<< avgTAT << " avg WT : " << avgWT << endl;
+    printResult(tat,wt,n);
 }
+
 
 int main(){
 
-    int n; 
+    int n ;
     cout << "Enter Number of Process : ";
     cin >> n;
 
     int at[n] = {};
     int bt[n] = {};
-    int prio[n] = {};
+    int p[n]  = {};
 
-
-    for(int i = 0 ; i < n ; i++ ){
-        cout << "Enter Arrival Time Process " << i + 1 << " " ;
+    for(int i=0 ; i<n ; i++){
+        cout << "Enter AT for Process " <<  i+1 << " " ;
         cin >> at[i];
     }
 
-    for(int i = 0 ; i < n ; i++ ){
-        cout << "Enter Bus Time Process " << i + 1 << " " ;
+    for(int i=0 ; i<n ; i++){
+        cout << "Enter BT for Process " <<  i+1 << " " ;
         cin >> bt[i];
     }
 
-    for(int i = 0 ; i < n ; i++ ){
-        cout << "Enter Priority for Process " << i + 1 << " " ;
-        cin >> prio[i];
+
+    for(int i=0 ; i<n ; i++){
+        cout << "Enter Priority for Process " <<  i+1 << " " ;
+        cin >> p[i];
     }
 
 
     while(true){
 
-        int choice ;
-        cout << "FCFS 1 \nSJF Non Preemptive 2 \nSJF Non Preemptive 3 \nRound Robin 4 \nPriority Non Preemptive 5 \nPriority Preemption 6 "<<endl;
+        int choice; 
+        cout << "1 fcfs 2 sjfN 3 sjfP 4 Round Robin 5 PrioN 6 PrioN ";
         cin >> choice;
-        
+
         switch(choice){
 
             case 1 :
@@ -479,37 +380,31 @@ int main(){
                 sjfN(at,bt,n);
                 break;
 
-            case 3 :
+            case 3 : 
                 sjfP(at,bt,n);
                 break;
 
             case 4 :
-                int timeQuantum;
+                int timeQuantum ;
                 cout << "Enter Time Quantum : ";
                 cin >> timeQuantum;
                 roundRobin(at,bt,n,timeQuantum);
                 break;
 
-            case 5 :
-                priorityN(at,bt,prio,n);
+            case 5 : 
+                prioN(at,bt,p,n);
                 break;
 
-            case 6 :
-                priorityP(at,bt,prio,n);
+            case 6 : 
+                prioP(at,bt,p,n);
                 break;
 
             default :
-                cout <<"Invalid Choice"<<endl;
+                cout << "Invalid Choice" << endl;
                 break;
         }
 
-        if(choice == 3 ){
-            break;
-        }
+        break;
     }
 
-
-    return 0;
 }
-
-        
